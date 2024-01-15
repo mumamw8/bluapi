@@ -2,6 +2,7 @@ using API.Errors;
 using Core.Dtos;
 using Core.Dtos.WorkspaceDtos;
 using Core.Entities;
+using Core.Interfaces;
 using Core.Specifications.WorkspaceSpecifications;
 using Core.Specifications.WorkspaceUserMappingSpecifications;
 using Infrastructure.Data;
@@ -13,9 +14,9 @@ namespace API.Controllers;
 [Route("api/[controller]")]
 public class WorkspaceController : Controller
 {
-    private readonly UnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public WorkspaceController(UnitOfWork unitOfWork)
+    public WorkspaceController(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
     }

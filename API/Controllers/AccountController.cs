@@ -22,11 +22,11 @@ namespace API.Controllers;
 public class AccountController : Controller
 {
     private readonly UserManager<AppUser> _userManager;
-    private readonly TokenService _tokenService;
+    private readonly ITokenService _tokenService;
     private readonly IUserService _userService;
     private readonly IMailService _mailService;
 
-    public AccountController(UserManager<AppUser> userManager, TokenService tokenService, IUserService userService, IMailService mailService)
+    public AccountController(UserManager<AppUser> userManager, ITokenService tokenService, IUserService userService, IMailService mailService)
     {
         _userManager = userManager;
         _tokenService = tokenService;

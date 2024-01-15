@@ -2,6 +2,7 @@ using API.Errors;
 using Core.Dtos;
 using Core.Dtos.TimeRecordDtos;
 using Core.Entities;
+using Core.Interfaces;
 using Core.Specifications.TimeRecordSpecifications;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +13,9 @@ namespace API.Controllers;
 [Route("api/[controller]")]
 public class TimeRecordController : Controller
 {
-    private readonly UnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public TimeRecordController(UnitOfWork unitOfWork)
+    public TimeRecordController(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
     }

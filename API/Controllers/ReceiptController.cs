@@ -2,6 +2,7 @@ using API.Errors;
 using Core.Dtos;
 using Core.Dtos.ReceiptDtos;
 using Core.Entities;
+using Core.Interfaces;
 using Core.Specifications.ReceiptSpecifications;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +13,9 @@ namespace API.Controllers;
 [Route("api/[controller]")]
 public class ReceiptController : Controller
 {
-    private readonly UnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public ReceiptController(UnitOfWork unitOfWork)
+    public ReceiptController(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
     }

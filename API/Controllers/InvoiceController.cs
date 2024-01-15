@@ -2,6 +2,7 @@ using API.Errors;
 using Core.Dtos;
 using Core.Dtos.InvoiceDtos;
 using Core.Entities;
+using Core.Interfaces;
 using Core.Specifications.InvoiceSpecifications;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +13,9 @@ namespace API.Controllers;
 [Route("api/[controller]")]
 public class InvoiceController : Controller
 {
-    private readonly UnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public InvoiceController(UnitOfWork unitOfWork)
+    public InvoiceController(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
     }

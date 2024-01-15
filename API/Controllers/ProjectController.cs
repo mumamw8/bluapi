@@ -2,6 +2,7 @@ using API.Errors;
 using Core.Dtos;
 using Core.Dtos.ProjectDtos;
 using Core.Entities;
+using Core.Interfaces;
 using Core.Specifications.ProjectSpecifications;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +13,9 @@ namespace API.Controllers;
 [Route("api/[controller]")]
 public class ProjectController : Controller
 {
-    private readonly UnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public ProjectController(UnitOfWork unitOfWork)
+    public ProjectController(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
     }
@@ -109,7 +110,7 @@ public class ProjectController : Controller
     
     // get statuses
     [HttpGet("statuses")]
-    public async Task<ActionResult<List<ProjectStatus>>> GetProjectStatuses()
+    public async Task<ActionResult<IReadOnlyList<ProjectStatus>>> GetProjectStatuses()
     {
         var statuses = await _unitOfWork.Repository<ProjectStatus>().ListAllAsync();
         // if (statuses.Count < 0) return NotFound(new ApiResponse(404));

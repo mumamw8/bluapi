@@ -2,6 +2,7 @@ using API.Errors;
 using Core.Dtos;
 using Core.Dtos.ContactDtos;
 using Core.Entities;
+using Core.Interfaces;
 using Core.Specifications;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +13,9 @@ namespace API.Controllers;
 [Route("api/[controller]")]
 public class ContactController : Controller
 {
-    private readonly UnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public ContactController(UnitOfWork unitOfWork)
+    public ContactController(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
     }
