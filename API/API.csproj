@@ -34,9 +34,4 @@
     <Folder Include="Middleware\" />
     <Folder Include="Pages\" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\.dockerignore">
-      <Link>.dockerignore</Link>
-    </Content>
-  </ItemGroup>
 </Project>

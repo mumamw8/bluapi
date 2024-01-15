@@ -17,7 +17,7 @@ public class MailService : IMailService
 
     public async Task SendEmailAsync(string toEmail, string subject, string content)
     {
-        var apiKey = _configuration["SENDGRID_API_KEY"];
+        var apiKey = _configuration["SendGridApiKey"];
         var client = new SendGridClient(apiKey);
         var from = new EmailAddress("mumamw8@outlook.com", "CashCal");
         var to = new EmailAddress(toEmail);

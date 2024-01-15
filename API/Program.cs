@@ -28,7 +28,7 @@ builder.Services.AddControllers(options =>
 builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddDbContext<DataContext>(opt =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("PostgreDev");
+    var connectionString = builder.Configuration.GetConnectionString("NeonPostgreString");
     opt.UseNpgsql(connectionString);
 });
 
@@ -119,4 +119,3 @@ catch (Exception ex)
 }
 
 app.Run();
-
