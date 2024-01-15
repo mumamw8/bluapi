@@ -16,8 +16,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
+[AllowAnonymous]
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class AccountController : Controller
 {
     private readonly UserManager<AppUser> _userManager;
@@ -32,8 +33,7 @@ public class AccountController : Controller
         _userService = userService;
         _mailService = mailService;
     }
-
-    [AllowAnonymous]
+    
     [HttpPost("login")]
     public async Task<ActionResult<UserServiceResponse>> Login(LoginDto model)
     {
@@ -50,13 +50,12 @@ public class AccountController : Controller
 
         return BadRequest(result);
     }
-
-    [AllowAnonymous]
+    
     [HttpPost("Register")]
     public async Task<ActionResult<UserServiceResponse>> Register(RegisterDto model)
     {
-        if (ModelState.IsValid)
-            return BadRequest("Some properties are not valid"); // Status code: 400
+        // if (ModelState.IsValid)
+        //     return BadRequest("Some properties are not valid"); // Status code: 400
 
         var result = await _userService.RegisterUserAsync(model);
 
@@ -67,7 +66,6 @@ public class AccountController : Controller
     }
 
     // /api/account/confirmemail?userid&token
-    [AllowAnonymous]
     [HttpGet("ConfirmEmail")]
     public async Task<IActionResult> ConfirmEmail(string userId, string token)
     {
@@ -93,7 +91,6 @@ public class AccountController : Controller
     }
 
     // forgot password api/account/forgotpassword?email=example@email.com
-    [AllowAnonymous]
     [HttpPost("ForgotPassword")]
     public async Task<ActionResult<UserServiceResponse>> ForgotPassword(string email)
     {
@@ -109,7 +106,6 @@ public class AccountController : Controller
     }
 
     // reset password
-    [AllowAnonymous]
     [HttpPost("ResetPassword")]
     public async Task<ActionResult<UserServiceResponse>> ResetPassword([FromForm] ResetPasswordDto model)
     {
