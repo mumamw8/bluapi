@@ -28,6 +28,8 @@ public class WorkspaceController : Controller
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<Pagination<WorkspaceReturnDto>>> GetWorkspaces([FromQuery]WorkspaceSpecParams workspaceSpecParams)
     {
+        // TODO: return workspace without workspaceusermappings
+        
         var spec = new WorkspaceWithUserAndWsUMappingsSpecifications(workspaceSpecParams); // specs to evaluate
         var countSpec = new WorkspaceWithFiltersForCount(workspaceSpecParams); // count spec
         
@@ -147,6 +149,8 @@ public class WorkspaceController : Controller
     [HttpPut("mapping")]
     public async Task<ActionResult<WorkspaceUserMapping>> UpdateWorkspaceUserMapping(WorkspaceUserMapping workspaceUserMappingToUpdate)
     {
+        // TODO: Check if workspace owner is same as current user
+        
         // only updates values sent
         _unitOfWork.Repository<WorkspaceUserMapping>()!.Update(workspaceUserMappingToUpdate);
         var result = await _unitOfWork.Complete();

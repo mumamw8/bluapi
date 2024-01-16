@@ -12,5 +12,5 @@ public class ClientAddDto
     public string? ProfileImageUrl { get; set; }
     // FK
     public Guid WorkspaceId { get; set; }
-    public Guid ContactId { get; set; }
+    public Guid? ContactId { get; set; }
 }

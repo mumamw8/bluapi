@@ -14,7 +14,7 @@ public class Client : BaseEntity
     
     // FK
     public Guid WorkspaceId { get; set; }
-    public Guid ContactId { get; set; }
+    public Guid? ContactId { get; set; }
     // nav props
     public virtual Workspace? Workspace { get; set; }
     public virtual Contact? Contact { get; set; }
