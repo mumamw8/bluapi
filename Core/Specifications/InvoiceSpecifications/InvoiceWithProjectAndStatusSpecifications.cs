@@ -14,7 +14,8 @@ public class InvoiceWithProjectAndStatusSpecifications : BaseSpecification<Invoi
             (!invoiceSpecParams.InvoiceStatusId.HasValue || x.InvoiceStatusId == invoiceSpecParams.InvoiceStatusId)
         )
     {
-        AddInclude(x => x.Project!);
+        // AddInclude(x => x.Project!);
+        AddInclude(x => x.InvoiceItems!);
         AddInclude(x => x.Status!);
         AddOrderBy(x => x.InvoiceNumber!);
         ApplyPaging(invoiceSpecParams.PageSize * (invoiceSpecParams.PageIndex - 1), invoiceSpecParams.PageSize);
