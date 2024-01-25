@@ -50,7 +50,8 @@ public class EstimateController : Controller
             Client = estimate.Client,
             Status = estimate.Status,
             CreatedAt = estimate.CreatedAt,
-            UpdatedAt = estimate.UpdatedAt
+            UpdatedAt = estimate.UpdatedAt,
+            WorkspaceId = estimate.WorkspaceId
         }).ToList();
 
         return Ok(new Pagination<EstimateReturnDto>(estimateSpecParams.PageIndex, estimateSpecParams.PageSize, totalItems, data));
@@ -79,7 +80,8 @@ public class EstimateController : Controller
             Client = estimate.Client,
             Status = estimate.Status,
             CreatedAt = estimate.CreatedAt,
-            UpdatedAt = estimate.UpdatedAt
+            UpdatedAt = estimate.UpdatedAt,
+            WorkspaceId = estimate.WorkspaceId
         };
     }
     

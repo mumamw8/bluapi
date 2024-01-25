@@ -20,4 +20,5 @@ public class EstimateReturnDto
     // FK
     public Guid ClientId { get; set; }
     public int EstimateStatusId { get; set; }
+    public Guid WorkspaceId { get; set; }
 }

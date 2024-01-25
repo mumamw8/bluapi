@@ -28,4 +28,5 @@ public class InvoiceReturnDto
     public Guid ProjectId { get; set; }
     [Required]
     public int InvoiceStatusId { get; set; }
+    public Guid WorkspaceId { get; set; }
 }

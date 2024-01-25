@@ -55,7 +55,8 @@ public class InvoiceController : Controller
             Project = invoice.Project,
             Status = invoice.Status,
             LogoUrl = invoice.LogoUrl,
-            InvoiceItems = invoice.InvoiceItems
+            InvoiceItems = invoice.InvoiceItems,
+            WorkspaceId = invoice.WorkspaceId
         }).ToList();
 
         return Ok(new Pagination<InvoiceReturnDto>(invoiceSpecParams.PageIndex, invoiceSpecParams.PageSize, totalItems, data));
@@ -89,7 +90,8 @@ public class InvoiceController : Controller
             Project = invoice.Project,
             Status = invoice.Status,
             LogoUrl = invoice.LogoUrl,
-            InvoiceItems = invoice.InvoiceItems
+            InvoiceItems = invoice.InvoiceItems,
+            WorkspaceId = invoice.WorkspaceId
         };
     }
     

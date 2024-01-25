@@ -14,7 +14,7 @@ public class EstimateWithClientAndStatusSpecification : BaseSpecification<Estima
             (!estimateSpecParams.EstimateStatusId.HasValue || x.EstimateStatusId == estimateSpecParams.EstimateStatusId)
         )
     {
-        AddInclude(x => x.Client!);
+        // AddInclude(x => x.Client!);
         AddInclude(x => x.Status!);
         AddOrderBy(x => x.EstimateNumber!);
         ApplyPaging(estimateSpecParams.PageSize * (estimateSpecParams.PageIndex - 1), estimateSpecParams.PageSize);
