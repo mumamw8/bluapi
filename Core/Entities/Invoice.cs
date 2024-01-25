@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using Core.Dtos.InvoiceDtos;
 
 namespace Core.Entities;
 

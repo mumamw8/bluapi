@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Core.Entities;
 
@@ -12,6 +13,7 @@ public class InvoiceItem : BaseEntity
     public decimal TotalPrice { get; set; }
     
     // nav props
+    [JsonIgnore]
     public virtual Invoice? Invoice { get; set; }
     // FK
     public Guid InvoiceId { get; set; }
