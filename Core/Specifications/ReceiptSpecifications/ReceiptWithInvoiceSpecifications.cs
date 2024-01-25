@@ -13,7 +13,7 @@ public class ReceiptWithInvoiceSpecifications : BaseSpecification<Receipt>
             (!receiptSpecParams.InvoiceId.HasValue || x.InvoiceId == receiptSpecParams.InvoiceId)
         )
     {
-        AddInclude(x => x.Invoice!);
+        // AddInclude(x => x.Invoice!);
         AddOrderBy(x => x.ReceiptNumber!);
         ApplyPaging(receiptSpecParams.PageSize * (receiptSpecParams.PageIndex - 1), receiptSpecParams.PageSize);
     }
