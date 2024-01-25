@@ -1,4 +1,5 @@
-﻿using API.Errors;
+﻿using System.Text.Json.Serialization;
+using API.Errors;
 using API.Extensions;
 using API.Middleware;
 using Core.Interfaces;
@@ -23,7 +24,7 @@ builder.Services.AddControllers(options =>
 {
     var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
     options.Filters.Add(new AuthorizeFilter(policy));
-});
+}).AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddDbContext<DataContext>(opt =>

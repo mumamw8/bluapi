@@ -110,7 +110,7 @@ public class WorkspaceController : Controller
     
     // get list WorkspaceMappings
     [HttpGet("mapping")]
-    public async Task<ActionResult<Pagination<WorkspaceUserMapping>>> GetMembers(WorkspaceUserMappingSpecParams workspaceUserMappingSpecParams)
+    public async Task<ActionResult<Pagination<WorkspaceUserMapping>>> GetMembers([FromQuery]WorkspaceUserMappingSpecParams workspaceUserMappingSpecParams)
     {
         var spec = new WsUMappingWithWorkspaceAndUserSpecifications(workspaceUserMappingSpecParams);
         var countSpec = new WorkspaceUserMappingWithFiltersForCount(workspaceUserMappingSpecParams);
@@ -134,11 +134,18 @@ public class WorkspaceController : Controller
     [HttpPost("mapping")]
     public async Task<ActionResult<Contact>> CreateWorkspaceUserMapping(WorkspaceUserMappingAddDto workspaceUserMappingAddDto)
     {
+        var workspace = await _unitOfWork.Repository<Workspace>()!.GetByIdAsync(workspaceUserMappingAddDto.WorkspaceId);
+        var currentUserId = HttpContext.User.RetrieveUserIdFromPrincipal();
+
+        if (workspace.AppUserId != currentUserId)
+            return Unauthorized("No permission to perform this action");
+        
         var workspaceUserMapping = new WorkspaceUserMapping
         {
             WorkspaceId = workspaceUserMappingAddDto.WorkspaceId,
             AppUserId = workspaceUserMappingAddDto.AppUserId
         };
+        
         _unitOfWork.Repository<WorkspaceUserMapping>()!.Add(workspaceUserMapping);
         var result = await _unitOfWork.Complete();
         if (result <= 0) return BadRequest(new ApiResponse(400, "Problem creating workspace mapping"));
@@ -150,7 +157,12 @@ public class WorkspaceController : Controller
     public async Task<ActionResult<WorkspaceUserMapping>> UpdateWorkspaceUserMapping(WorkspaceUserMapping workspaceUserMappingToUpdate)
     {
         // TODO: Check if workspace owner is same as current user
-        
+        var workspace = await _unitOfWork.Repository<Workspace>()!.GetByIdAsync(workspaceUserMappingToUpdate.WorkspaceId);
+        var currentUserId = HttpContext.User.RetrieveUserIdFromPrincipal();
+
+        if (workspace.AppUserId != currentUserId)
+            return Unauthorized("No permission to perform this action");
+
         // only updates values sent
         _unitOfWork.Repository<WorkspaceUserMapping>()!.Update(workspaceUserMappingToUpdate);
         var result = await _unitOfWork.Complete();

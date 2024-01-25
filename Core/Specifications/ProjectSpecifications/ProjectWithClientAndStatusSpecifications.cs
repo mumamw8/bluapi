@@ -10,6 +10,7 @@ public class ProjectWithClientAndStatusSpecifications : BaseSpecification<Projec
         : base(x =>
             (string.IsNullOrEmpty(projectSpecParams.Search) || x.Name!.ToLower().Contains(projectSpecParams.Search)) &&
             (!projectSpecParams.ClientId.HasValue || x.ClientId == projectSpecParams.ClientId) &&
+            (!projectSpecParams.WorkspaceId.HasValue || x.WorkspaceId == projectSpecParams.WorkspaceId) &&
             (!projectSpecParams.ProjectStatusId.HasValue || x.ProjectStatusId == projectSpecParams.ProjectStatusId)
         )
     {

@@ -14,6 +14,7 @@ public class ProjectSpecParams
 
     public Guid? ClientId { get; set; }
     public int? ProjectStatusId { get; set; }
+    public Guid? WorkspaceId { get; set; }
     public string? Sort { get; set; }
     private string? _search;
     public string? Search

@@ -10,6 +10,7 @@ public class InvoiceWithProjectAndStatusSpecifications : BaseSpecification<Invoi
         : base(x =>
             (string.IsNullOrEmpty(invoiceSpecParams.Search) || x.InvoiceNumber!.ToLower().Contains(invoiceSpecParams.Search)) &&
             (!invoiceSpecParams.ProjectId.HasValue || x.ProjectId == invoiceSpecParams.ProjectId) &&
+            (!invoiceSpecParams.WorkspaceId.HasValue || x.WorkspaceId == invoiceSpecParams.WorkspaceId ) &&
             (!invoiceSpecParams.InvoiceStatusId.HasValue || x.InvoiceStatusId == invoiceSpecParams.InvoiceStatusId)
         )
     {

@@ -9,6 +9,7 @@ public class EstimateWithFiltersForCount : BaseSpecification<Estimate>
         : base(x =>
             (string.IsNullOrEmpty(estimateSpecParams.Search) || x.EstimateNumber!.ToLower().Contains(estimateSpecParams.Search)) &&
             (!estimateSpecParams.ClientId.HasValue || x.ClientId == estimateSpecParams.ClientId) &&
+            (!estimateSpecParams.WorkspaceId.HasValue || x.WorkspaceId == estimateSpecParams.WorkspaceId) &&
             (!estimateSpecParams.EstimateStatusId.HasValue || x.EstimateStatusId == estimateSpecParams.EstimateStatusId)
         )
     {

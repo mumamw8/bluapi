@@ -9,6 +9,7 @@ public class ReceiptWithInvoiceSpecifications : BaseSpecification<Receipt>
     public ReceiptWithInvoiceSpecifications(ReceiptSpecParams receiptSpecParams) 
         : base(x =>
             (string.IsNullOrEmpty(receiptSpecParams.Search) || x.ReceiptNumber!.ToLower().Contains(receiptSpecParams.Search)) &&
+            (!receiptSpecParams.WorkspaceId.HasValue || x.WorkspaceId == receiptSpecParams.WorkspaceId) &&
             (!receiptSpecParams.InvoiceId.HasValue || x.InvoiceId == receiptSpecParams.InvoiceId)
         )
     {

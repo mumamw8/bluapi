@@ -12,9 +12,9 @@ public class WsUMappingWithWorkspaceAndUserSpecifications : BaseSpecification<Wo
             (string.IsNullOrEmpty(workspaceUserMappingSpecParams.AppUserId) || x.AppUserId == workspaceUserMappingSpecParams.AppUserId)
         )
     {
-        AddInclude(x => x.Workspace!);
-        AddInclude(x => x.AppUser!);
-        AddOrderBy(x => x.AppUser!.LastName!);
+        // AddInclude(x => x.Workspace!);
+        // AddInclude(x => x.AppUser!);
+        // AddOrderBy(x => x.AppUser!.LastName!);
         ApplyPaging(workspaceUserMappingSpecParams.PageSize * (workspaceUserMappingSpecParams.PageIndex - 1), workspaceUserMappingSpecParams.PageSize);
     }
     

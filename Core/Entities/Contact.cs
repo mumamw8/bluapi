@@ -13,6 +13,11 @@ public class Contact : BaseEntity
     [Phone]
     public string? PhoneNumber { get; set; }
     
+    // FK
+    [Required]
+    public Guid WorkspaceId { get; set; }
+
     // nav props
     public virtual ICollection<Client>? Clients { get; set; }
+    public virtual Workspace? Workspace { get; set; }
 }

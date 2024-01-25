@@ -10,6 +10,7 @@ public class TimeRecordWithProjectAndUserSpecifications : BaseSpecification<Time
         : base(x =>
             (string.IsNullOrEmpty(timeRecordSpecParams.Search) || x.Description!.ToLower().Contains(timeRecordSpecParams.Search)) &&
             (!timeRecordSpecParams.ProjectId.HasValue || x.ProjectId == timeRecordSpecParams.ProjectId) &&
+            (!timeRecordSpecParams.WorkspaceId.HasValue || x.WorkspaceId == timeRecordSpecParams.WorkspaceId) &&
             (string.IsNullOrEmpty(timeRecordSpecParams.AppUserId) || x.AppUserId == timeRecordSpecParams.AppUserId)
         )
     {

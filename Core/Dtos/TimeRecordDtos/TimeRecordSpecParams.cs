@@ -13,6 +13,7 @@ public class TimeRecordSpecParams
     }
 
     public Guid? ProjectId { get; set; }
+    public Guid? WorkspaceId { get; set; }
     public string? AppUserId { get; set; }
     public string? Sort { get; set; }
     private string? _search;

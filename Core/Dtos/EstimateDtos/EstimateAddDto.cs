@@ -13,5 +13,6 @@ public class EstimateAddDto
     public decimal Total { get; set; }
     // FK
     public Guid ClientId { get; set; }
+    public Guid WorkspaceId { get; set; }
     public int EstimateStatusId { get; set; }
 }

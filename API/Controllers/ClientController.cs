@@ -1,10 +1,13 @@
 using System.Security.Claims;
 using API.Errors;
+using API.Extensions;
 using Core.Dtos;
 using Core.Dtos.ClientDtos;
+using Core.Dtos.WorkspaceDtos;
 using Core.Entities;
 using Core.Interfaces;
 using Core.Specifications;
+using Core.Specifications.WorkspaceUserMappingSpecifications;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -29,9 +32,9 @@ public class ClientController : Controller
         var spec = new ClientWithWorkspaceAndContactSpecification(clientSpecParams); // specs to evaluate
         var countSpec = new ClientWithFiltersForCount(clientSpecParams); // count spec
         
-        var clients = await _unitOfWork.Repository<Client>().ListAsync(spec);
+        var clients = await _unitOfWork.Repository<Client>()!.ListAsync(spec);
         // if (clients == null) return NotFound(new ApiResponse(404));
-        var totalItems = await _unitOfWork.Repository<Client>().CountAsync(countSpec);
+        var totalItems = await _unitOfWork.Repository<Client>()!.CountAsync(countSpec);
         
         var data = clients.Select(client => new ClientReturnDto
         {
@@ -76,6 +79,10 @@ public class ClientController : Controller
     [HttpPost]
     public async Task<ActionResult<Client>> CreateClient(ClientAddDto clientAddDto)
     {
+        var currentUserId = HttpContext.User.RetrieveUserIdFromPrincipal();
+        var spec = new WsUMappingWithWorkspaceAndUserSpecifications(new WorkspaceUserMappingSpecParams { WorkspaceId = clientAddDto.WorkspaceId, AppUserId = currentUserId});
+        var mapping = await _unitOfWork.Repository<WorkspaceUserMapping>()!.ListAsync(spec);
+
         var client = new Client
         {
             Name = clientAddDto.Name,
@@ -86,7 +93,12 @@ public class ClientController : Controller
             WorkspaceId = clientAddDto.WorkspaceId,
             ProfileImageUrl = clientAddDto.ProfileImageUrl
         };
-        _unitOfWork.Repository<Client>().Add(client);
+        
+        if (mapping.Count > 0)
+        {
+            _unitOfWork.Repository<Client>()!.Add(client);
+        }
+        
         var result = await _unitOfWork.Complete();
         if (result <= 0) return BadRequest(new ApiResponse(400, "Problem creating client"));
         return Ok(client);
@@ -96,7 +108,7 @@ public class ClientController : Controller
     [HttpPut]
     public async Task<ActionResult<Client>> UpdateClient(Client clientToUpdate)
     {
-        _unitOfWork.Repository<Client>().Update(clientToUpdate);
+        _unitOfWork.Repository<Client>()!.Update(clientToUpdate);
         var result = await _unitOfWork.Complete();
         if (result <= 0) return BadRequest(new ApiResponse(400, "Problem updating client"));
         return Ok(clientToUpdate);
@@ -106,8 +118,8 @@ public class ClientController : Controller
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> DeleteClient(Guid id)
     {
-        var client = await _unitOfWork.Repository<Client>().GetByIdAsync(id);
-        _unitOfWork.Repository<Client>().Delete(client);
+        var client = await _unitOfWork.Repository<Client>()!.GetByIdAsync(id);
+        _unitOfWork.Repository<Client>()!.Delete(client);
         var result = await _unitOfWork.Complete();
         if (result <= 0) return BadRequest(new ApiResponse(400, "Problem deleting client"));
         return Ok();

@@ -10,4 +10,5 @@ public class ReceiptAddDto
     public string? ReceiptFileUrl { get; set; }
     // FK
     public Guid InvoiceId { get; set; }
+    public Guid WorkspaceId { get; set; }
 }

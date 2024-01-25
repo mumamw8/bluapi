@@ -12,5 +12,5 @@ public class InvoiceItemAddDto
     public int Quantity { get; set; }
     public decimal TotalPrice { get; set; }
     // FK
-    public Guid InvoiceId { get; set; }
+    // public Guid InvoiceId { get; set; }
 }

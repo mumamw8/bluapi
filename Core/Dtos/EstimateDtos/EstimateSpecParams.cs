@@ -13,6 +13,7 @@ public class EstimateSpecParams
     }
 
     public Guid? ClientId { get; set; }
+    public Guid? WorkspaceId { get; set; }
     public int? EstimateStatusId { get; set; }
     public string? Sort { get; set; }
     private string? _search;

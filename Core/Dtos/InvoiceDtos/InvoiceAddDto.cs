@@ -23,7 +23,8 @@ public class InvoiceAddDto
     public decimal Total { get; set; }
     // FK
     public Guid ProjectId { get; set; }
+    public Guid WorkspaceId { get; set; }
     [Required]
     public int InvoiceStatusId { get; set; }
-    public List<InvoiceItem>? InvoiceItems { get; set; }
+    public List<InvoiceItemAddDto>? InvoiceItems { get; set; }
 }

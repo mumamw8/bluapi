@@ -8,5 +8,6 @@ public class TimeRecordAddDto
     public string? Description { get; set; }
     // FK
     public Guid ProjectId { get; set; }
+    public Guid WorkspaceId { get; set; }
     // public string? AppUserId { get; set; } get from session
 }

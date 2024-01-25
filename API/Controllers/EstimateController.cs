@@ -1,9 +1,12 @@
 using API.Errors;
+using API.Extensions;
 using Core.Dtos;
 using Core.Dtos.EstimateDtos;
+using Core.Dtos.WorkspaceDtos;
 using Core.Entities;
 using Core.Interfaces;
 using Core.Specifications.EstimateSpecifications;
+using Core.Specifications.WorkspaceUserMappingSpecifications;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,9 +32,9 @@ public class EstimateController : Controller
         var spec = new EstimateWithClientAndStatusSpecification(estimateSpecParams); // specs to evaluate
         var countSpec = new EstimateWithFiltersForCount(estimateSpecParams); // count spec
         
-        var estimates = await _unitOfWork.Repository<Estimate>().ListAsync(spec);
+        var estimates = await _unitOfWork.Repository<Estimate>()?.ListAsync(spec)!;
         // if (clients == null) return NotFound(new ApiResponse(404));
-        var totalItems = await _unitOfWork.Repository<Estimate>().CountAsync(countSpec);
+        var totalItems = await _unitOfWork.Repository<Estimate>()?.CountAsync(countSpec)!;
         
         var data = estimates.Select(estimate => new EstimateReturnDto
         {
@@ -60,7 +63,7 @@ public class EstimateController : Controller
     public async Task<ActionResult<EstimateReturnDto>> GetEstimate(Guid id)
     {
         var spec = new EstimateWithClientAndStatusSpecification(id);
-        var estimate = await _unitOfWork.Repository<Estimate>().GetEntityWithSpec(spec);
+        var estimate = await _unitOfWork.Repository<Estimate>()?.GetEntityWithSpec(spec)!;
         // if (client == null) return NotFound(new ApiResponse(404));
         return new EstimateReturnDto
         {
@@ -84,6 +87,10 @@ public class EstimateController : Controller
     [HttpPost]
     public async Task<ActionResult<Estimate>> CreateEstimate(EstimateAddDto estimateAddDto)
     {
+        var currentUserId = HttpContext.User.RetrieveUserIdFromPrincipal();
+        var spec = new WsUMappingWithWorkspaceAndUserSpecifications(new WorkspaceUserMappingSpecParams { WorkspaceId = estimateAddDto.WorkspaceId, AppUserId = currentUserId});
+        var mapping = await _unitOfWork.Repository<WorkspaceUserMapping>()!.ListAsync(spec);
+        
         var estimate = new Estimate
         {
             EstimateNumber = estimateAddDto.EstimateNumber,
@@ -93,9 +100,10 @@ public class EstimateController : Controller
             Tax = estimateAddDto.Tax,
             Total = estimateAddDto.Total,
             ClientId = estimateAddDto.ClientId,
-            EstimateStatusId = estimateAddDto.EstimateStatusId
+            EstimateStatusId = estimateAddDto.EstimateStatusId,
+            WorkspaceId = estimateAddDto.WorkspaceId
         };
-        _unitOfWork.Repository<Estimate>().Add(estimate);
+        _unitOfWork.Repository<Estimate>()?.Add(estimate);
         var result = await _unitOfWork.Complete();
         if (result <= 0) return BadRequest(new ApiResponse(400, "Problem creating contact"));
         return Ok(estimate);
@@ -105,7 +113,7 @@ public class EstimateController : Controller
     [HttpPut]
     public async Task<ActionResult<Estimate>> UpdateEstimate(Estimate estimateToUpdate)
     {
-        _unitOfWork.Repository<Estimate>().Update(estimateToUpdate);
+        _unitOfWork.Repository<Estimate>()?.Update(estimateToUpdate);
         var result = await _unitOfWork.Complete();
         if (result <= 0) return BadRequest(new ApiResponse(400, "Problem updating estimate"));
         return Ok(estimateToUpdate);
@@ -115,8 +123,8 @@ public class EstimateController : Controller
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> DeleteEstimate(Guid id)
     {
-        var estimate = await _unitOfWork.Repository<Estimate>().GetByIdAsync(id);
-        _unitOfWork.Repository<Estimate>().Delete(estimate);
+        var estimate = await _unitOfWork.Repository<Estimate>()?.GetByIdAsync(id)!;
+        _unitOfWork.Repository<Estimate>()?.Delete(estimate);
         var result = await _unitOfWork.Complete();
         if (result <= 0) return BadRequest(new ApiResponse(400, "Problem deleting estimate"));
         return Ok();
@@ -126,7 +134,7 @@ public class EstimateController : Controller
     [HttpGet("statuses")]
     public async Task<ActionResult<List<EstimateStatus>>> GetEstimateStatuses()
     {
-        var statuses = await _unitOfWork.Repository<EstimateStatus>().ListAllAsync();
+        var statuses = await _unitOfWork.Repository<EstimateStatus>()?.ListAllAsync()!;
         // if (statuses.Count < 0) return NotFound(new ApiResponse(404));
         return Ok(statuses);
     }

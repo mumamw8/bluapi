@@ -1,9 +1,12 @@
 using API.Errors;
+using API.Extensions;
 using Core.Dtos;
 using Core.Dtos.InvoiceDtos;
+using Core.Dtos.WorkspaceDtos;
 using Core.Entities;
 using Core.Interfaces;
 using Core.Specifications.InvoiceSpecifications;
+using Core.Specifications.WorkspaceUserMappingSpecifications;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,9 +32,9 @@ public class InvoiceController : Controller
         var spec = new InvoiceWithProjectAndStatusSpecifications(invoiceSpecParams); // specs to evaluate
         var countSpec = new InvoiceWithFiltersForCount(invoiceSpecParams); // count spec
         
-        var invoices = await _unitOfWork.Repository<Invoice>().ListAsync(spec);
+        var invoices = await _unitOfWork.Repository<Invoice>()?.ListAsync(spec)!;
         // if (clients == null) return NotFound(new ApiResponse(404));
-        var totalItems = await _unitOfWork.Repository<Invoice>().CountAsync(countSpec);
+        var totalItems = await _unitOfWork.Repository<Invoice>()?.CountAsync(countSpec)!;
         
         var data = invoices.Select(invoice => new InvoiceReturnDto
         {
@@ -65,7 +68,7 @@ public class InvoiceController : Controller
     public async Task<ActionResult<InvoiceReturnDto>> GetInvoice(Guid id)
     {
         var spec = new InvoiceWithProjectAndStatusSpecifications(id);
-        var invoice = await _unitOfWork.Repository<Invoice>().GetEntityWithSpec(spec);
+        var invoice = await _unitOfWork.Repository<Invoice>()?.GetEntityWithSpec(spec)!;
         // if (client == null) return NotFound(new ApiResponse(404));
         return new InvoiceReturnDto
         {
@@ -94,8 +97,20 @@ public class InvoiceController : Controller
     [HttpPost]
     public async Task<ActionResult<Invoice>> CreateContact(InvoiceAddDto invoiceAddDto)
     {
+        var currentUserId = HttpContext.User.RetrieveUserIdFromPrincipal();
+        var spec = new WsUMappingWithWorkspaceAndUserSpecifications(new WorkspaceUserMappingSpecParams { WorkspaceId = invoiceAddDto.WorkspaceId, AppUserId = currentUserId});
+        var mapping = await _unitOfWork.Repository<WorkspaceUserMapping>()!.ListAsync(spec);
+        
         var items = new List<InvoiceItem>();
-        if (invoiceAddDto.InvoiceItems != null) items.AddRange(invoiceAddDto.InvoiceItems);
+        if (invoiceAddDto.InvoiceItems != null)
+            items.AddRange(invoiceAddDto.InvoiceItems.Select(item => new InvoiceItem
+            {
+                Description = item.Description,
+                Details = item.Description,
+                Quantity = item.Quantity,
+                TotalPrice = item.TotalPrice,
+                UnitPrice = item.UnitPrice
+            }));
 
         var invoice = new Invoice
         {
@@ -113,9 +128,10 @@ public class InvoiceController : Controller
             ProjectId = invoiceAddDto.ProjectId,
             InvoiceStatusId = invoiceAddDto.InvoiceStatusId,
             LogoUrl = invoiceAddDto.LogoUrl,
-            InvoiceItems = items
+            InvoiceItems = items,
+            WorkspaceId = invoiceAddDto.WorkspaceId
         };
-        _unitOfWork.Repository<Invoice>().Add(invoice);
+        if (mapping.Count > 0) _unitOfWork.Repository<Invoice>()?.Add(invoice);
         
         var result = await _unitOfWork.Complete();
         if (result <= 0) return BadRequest(new ApiResponse(400, "Problem creating invoice"));
@@ -126,7 +142,7 @@ public class InvoiceController : Controller
     [HttpPut]
     public async Task<ActionResult<Invoice>> UpdateInvoice(Invoice invoiceToUpdate)
     {
-        _unitOfWork.Repository<Invoice>().Update(invoiceToUpdate);
+        _unitOfWork.Repository<Invoice>()?.Update(invoiceToUpdate);
         var result = await _unitOfWork.Complete();
         if (result <= 0) return BadRequest(new ApiResponse(400, "Problem updating invoice"));
         return Ok(invoiceToUpdate);
@@ -136,8 +152,8 @@ public class InvoiceController : Controller
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> DeleteInvoice(Guid id)
     {
-        var invoice = await _unitOfWork.Repository<Invoice>().GetByIdAsync(id);
-        _unitOfWork.Repository<Invoice>().Delete(invoice);
+        var invoice = await _unitOfWork.Repository<Invoice>()?.GetByIdAsync(id)!;
+        _unitOfWork.Repository<Invoice>()?.Delete(invoice);
         var result = await _unitOfWork.Complete();
         if (result <= 0) return BadRequest(new ApiResponse(400, "Problem deleting invoice"));
         return Ok();
@@ -147,7 +163,7 @@ public class InvoiceController : Controller
     [HttpGet("statuses")]
     public async Task<ActionResult<List<InvoiceStatus>>> GetInvoiceStatuses()
     {
-        var statuses = await _unitOfWork.Repository<InvoiceStatus>().ListAllAsync();
+        var statuses = await _unitOfWork.Repository<InvoiceStatus>()?.ListAllAsync()!;
         // if (statuses.Count < 0) return NotFound(new ApiResponse(404));
         return Ok(statuses);
     }
@@ -156,7 +172,7 @@ public class InvoiceController : Controller
     [HttpGet("item")]
     public async Task<ActionResult<List<InvoiceItem>>> GetInvoiceItems()
     {
-        var items = await _unitOfWork.Repository<InvoiceItem>().ListAllAsync();
+        var items = await _unitOfWork.Repository<InvoiceItem>()?.ListAllAsync()!;
         // if (statuses.Count < 0) return NotFound(new ApiResponse(404));
         return Ok(items);
     }
@@ -165,7 +181,7 @@ public class InvoiceController : Controller
     [HttpPut("item")]
     public async Task<ActionResult<InvoiceItem>> UpdateInvoiceItem(InvoiceItem invoiceItemToUpdate)
     {
-        _unitOfWork.Repository<InvoiceItem>().Update(invoiceItemToUpdate);
+        _unitOfWork.Repository<InvoiceItem>()?.Update(invoiceItemToUpdate);
         var result = await _unitOfWork.Complete();
         if (result <= 0) return BadRequest(new ApiResponse(400, "Problem updating invoiceItem"));
         return Ok(invoiceItemToUpdate);
@@ -175,8 +191,8 @@ public class InvoiceController : Controller
     [HttpDelete("item/{id:guid}")]
     public async Task<ActionResult> DeleteInvoiceItem(Guid id)
     {
-        var invoiceItem = await _unitOfWork.Repository<InvoiceItem>().GetByIdAsync(id);
-        _unitOfWork.Repository<InvoiceItem>().Delete(invoiceItem);
+        var invoiceItem = await _unitOfWork.Repository<InvoiceItem>()?.GetByIdAsync(id)!;
+        _unitOfWork.Repository<InvoiceItem>()?.Delete(invoiceItem);
         var result = await _unitOfWork.Complete();
         if (result <= 0) return BadRequest(new ApiResponse(400, "Problem deleting invoiceItem"));
         return Ok();

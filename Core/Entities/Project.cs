@@ -9,8 +9,8 @@ public class Project : BaseEntity
     [MaxLength(255)]
     public string? Name { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime Start { get; set; }
-    public DateTime End { get; set; }
+    public DateTime? Start { get; set; } = null;
+    public DateTime? End { get; set; } = null;
     
     // nav props
     public virtual Client? Client { get; set; }
@@ -19,6 +19,9 @@ public class Project : BaseEntity
     public Guid ClientId { get; set; }
     [Required]
     public int ProjectStatusId { get; set; }
+    [Required]
+    public Guid WorkspaceId { get; set; }
+    public virtual Workspace? Workspace { get; set; }
 }
 
 public class ProjectStatus

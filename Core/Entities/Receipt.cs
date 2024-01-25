@@ -13,4 +13,7 @@ public class Receipt : BaseEntity
     public Invoice? Invoice { get; set; }
     // FK
     public Guid InvoiceId { get; set; }
+    [Required]
+    public Guid WorkspaceId { get; set; }
+    public virtual Workspace? Workspace { get; set; }
 }

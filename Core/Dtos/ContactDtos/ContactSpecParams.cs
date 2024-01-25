@@ -14,6 +14,7 @@ public class ContactSpecParams
 
     public string? Sort { get; set; }
     private string? _search;
+    public Guid? WorkspaceId { get; set; }
     public string? Search
     {
         get => _search;

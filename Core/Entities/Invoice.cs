@@ -31,6 +31,9 @@ public class Invoice : BaseEntity
     public Guid ProjectId { get; set; }
     [Required]
     public int InvoiceStatusId { get; set; }
+    [Required]
+    public Guid WorkspaceId { get; set; }
+    public virtual Workspace? Workspace { get; set; }
 }
 
 public class InvoiceStatus

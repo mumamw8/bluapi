@@ -9,7 +9,8 @@ public class ContactSpecification : BaseSpecification<Contact>
     public ContactSpecification(ContactSpecParams contactSpecParams) 
         : base(x =>
             (string.IsNullOrEmpty(contactSpecParams.Search) || x.FirstName!.ToLower().Contains(contactSpecParams.Search)) &&
-            (string.IsNullOrEmpty(contactSpecParams.Search) || x.LastName!.ToLower().Contains(contactSpecParams.Search))
+            (string.IsNullOrEmpty(contactSpecParams.Search) || x.LastName!.ToLower().Contains(contactSpecParams.Search)) &&
+            (!contactSpecParams.WorkspaceId.HasValue || x.WorkspaceId == contactSpecParams.WorkspaceId)
         )
     {
         AddOrderBy(x => x.LastName!);

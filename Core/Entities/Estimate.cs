@@ -24,6 +24,9 @@ public class Estimate : BaseEntity
     public Guid ClientId { get; set; }
     [Required]
     public int EstimateStatusId { get; set; }
+    [Required]
+    public Guid WorkspaceId { get; set; }
+    public virtual Workspace? Workspace { get; set; }
 }
 
 public class EstimateStatus

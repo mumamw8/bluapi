@@ -12,6 +12,15 @@ public class DataContext : IdentityDbContext<AppUser>
 	{
 	}
 
+	protected override void OnModelCreating(ModelBuilder modelBuilder)
+	{
+		base.OnModelCreating(modelBuilder);
+		modelBuilder.Entity<Invoice>()
+			.HasMany(x => x.InvoiceItems)
+			.WithOne(x => x.Invoice)
+			.OnDelete(DeleteBehavior.Cascade);
+	}
+
 	// Tables
     public DbSet<Client> Clients { get; set; }
     public DbSet<Contact> Contacts { get; set; }

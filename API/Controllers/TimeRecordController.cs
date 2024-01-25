@@ -1,9 +1,12 @@
 using API.Errors;
+using API.Extensions;
 using Core.Dtos;
 using Core.Dtos.TimeRecordDtos;
+using Core.Dtos.WorkspaceDtos;
 using Core.Entities;
 using Core.Interfaces;
 using Core.Specifications.TimeRecordSpecifications;
+using Core.Specifications.WorkspaceUserMappingSpecifications;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,9 +32,9 @@ public class TimeRecordController : Controller
         var spec = new TimeRecordWithProjectAndUserSpecifications(timeRecordSpecParams); // specs to evaluate
         var countSpec = new TimeRecordWithFiltersForCount(timeRecordSpecParams); // count spec
         
-        var timeRecords = await _unitOfWork.Repository<TimeRecord>().ListAsync(spec);
+        var timeRecords = await _unitOfWork.Repository<TimeRecord>()!.ListAsync(spec);
         // if (clients == null) return NotFound(new ApiResponse(404));
-        var totalItems = await _unitOfWork.Repository<TimeRecord>().CountAsync(countSpec);
+        var totalItems = await _unitOfWork.Repository<TimeRecord>()!.CountAsync(countSpec);
         
         var data = timeRecords.Select(timeRecord => new TimeRecordReturnDto
         {
@@ -56,7 +59,7 @@ public class TimeRecordController : Controller
     public async Task<ActionResult<TimeRecordReturnDto>> GetTimeRecord(Guid id)
     {
         var spec = new TimeRecordWithProjectAndUserSpecifications(id);
-        var timeRecord = await _unitOfWork.Repository<TimeRecord>().GetEntityWithSpec(spec);
+        var timeRecord = await _unitOfWork.Repository<TimeRecord>()!.GetEntityWithSpec(spec);
         // if (client == null) return NotFound(new ApiResponse(404));
         return new TimeRecordReturnDto
         {
@@ -76,6 +79,11 @@ public class TimeRecordController : Controller
     [HttpPost]
     public async Task<ActionResult<TimeRecord>> CreateTimeRecord(TimeRecordAddDto timeRecordAddDto)
     {
+        var currentUserId = HttpContext.User.RetrieveUserIdFromPrincipal();
+        // get the users mapping to the given workspace
+        var spec = new WsUMappingWithWorkspaceAndUserSpecifications(new WorkspaceUserMappingSpecParams { WorkspaceId = timeRecordAddDto.WorkspaceId, AppUserId = currentUserId});
+        var mapping = await _unitOfWork.Repository<WorkspaceUserMapping>()!.ListAsync(spec);
+        
         var timeRecord = new TimeRecord
         {
             Start = timeRecordAddDto.Start,
@@ -83,9 +91,12 @@ public class TimeRecordController : Controller
             Duration = timeRecordAddDto.Duration,
             Description = timeRecordAddDto.Description,
             ProjectId = timeRecordAddDto.ProjectId,
-            AppUserId = ""
+            AppUserId = currentUserId,
+            WorkspaceId = timeRecordAddDto.WorkspaceId
         };
-        _unitOfWork.Repository<TimeRecord>().Add(timeRecord);
+        
+        // if no result user cannot create asset in workspace
+        if (mapping.Count > 0) _unitOfWork.Repository<TimeRecord>()!.Add(timeRecord);
         var result = await _unitOfWork.Complete();
         if (result <= 0) return BadRequest(new ApiResponse(400, "Problem creating time record"));
         return Ok(timeRecord);
@@ -95,7 +106,7 @@ public class TimeRecordController : Controller
     [HttpPut]
     public async Task<ActionResult<TimeRecord>> UpdateTimeRecord(TimeRecord timeRecordToUpdate)
     {
-        _unitOfWork.Repository<TimeRecord>().Update(timeRecordToUpdate);
+        _unitOfWork.Repository<TimeRecord>()!.Update(timeRecordToUpdate);
         var result = await _unitOfWork.Complete();
         if (result <= 0) return BadRequest(new ApiResponse(400, "Problem updating timeRecord"));
         return Ok(timeRecordToUpdate);
@@ -105,8 +116,8 @@ public class TimeRecordController : Controller
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> DeleteTimeRecord(Guid id)
     {
-        var timeRecord = await _unitOfWork.Repository<TimeRecord>().GetByIdAsync(id);
-        _unitOfWork.Repository<TimeRecord>().Delete(timeRecord);
+        var timeRecord = await _unitOfWork.Repository<TimeRecord>()!.GetByIdAsync(id);
+        _unitOfWork.Repository<TimeRecord>()!.Delete(timeRecord);
         var result = await _unitOfWork.Complete();
         if (result <= 0) return BadRequest(new ApiResponse(400, "Problem deleting time record"));
         return Ok();

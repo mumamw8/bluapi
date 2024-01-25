@@ -13,6 +13,7 @@ public class InvoiceSpecParams
     }
 
     public Guid? ProjectId { get; set; }
+    public Guid? WorkspaceId { get; set; }
     public int? InvoiceStatusId { get; set; }
     public string? Sort { get; set; }
     private string? _search;

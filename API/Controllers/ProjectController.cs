@@ -1,9 +1,12 @@
 using API.Errors;
+using API.Extensions;
 using Core.Dtos;
 using Core.Dtos.ProjectDtos;
+using Core.Dtos.WorkspaceDtos;
 using Core.Entities;
 using Core.Interfaces;
 using Core.Specifications.ProjectSpecifications;
+using Core.Specifications.WorkspaceUserMappingSpecifications;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,9 +32,9 @@ public class ProjectController : Controller
         var spec = new ProjectWithClientAndStatusSpecifications(projectSpecParams); // specs to evaluate
         var countSpec = new ProjectWithFiltersForCount(projectSpecParams); // count spec
         
-        var projects = await _unitOfWork.Repository<Project>().ListAsync(spec);
+        var projects = await _unitOfWork.Repository<Project>()!.ListAsync(spec);
         // if (clients == null) return NotFound(new ApiResponse(404));
-        var totalItems = await _unitOfWork.Repository<Project>().CountAsync(countSpec);
+        var totalItems = await _unitOfWork.Repository<Project>()!.CountAsync(countSpec);
         
         var data = projects.Select(project => new ProjectReturnDto
         {
@@ -54,7 +57,7 @@ public class ProjectController : Controller
     public async Task<ActionResult<ProjectReturnDto>> GetProject(Guid id)
     {
         var spec = new ProjectWithClientAndStatusSpecifications(id);
-        var project = await _unitOfWork.Repository<Project>().GetEntityWithSpec(spec);
+        var project = await _unitOfWork.Repository<Project>()!.GetEntityWithSpec(spec);
         // if (client == null) return NotFound(new ApiResponse(404));
         return new ProjectReturnDto
         {
@@ -72,16 +75,20 @@ public class ProjectController : Controller
     [HttpPost]
     public async Task<ActionResult<Project>> CreateProject(ProjectAddDto projectAddDto)
     {
+        var currentUserId = HttpContext.User.RetrieveUserIdFromPrincipal();
+        var spec = new WsUMappingWithWorkspaceAndUserSpecifications(new WorkspaceUserMappingSpecParams { WorkspaceId = projectAddDto.WorkspaceId, AppUserId = currentUserId});
+        var mapping = await _unitOfWork.Repository<WorkspaceUserMapping>()!.ListAsync(spec);
+        
         var project = new Project
         {
             Name = projectAddDto.Name,
-            CreatedAt = projectAddDto.CreatedAt,
             ProjectStatusId = projectAddDto.ProjectStatusId,
             Start = projectAddDto.Start,
             End = projectAddDto.End,
-            ClientId = projectAddDto.ClientId
+            ClientId = projectAddDto.ClientId,
+            WorkspaceId = projectAddDto.WorkspaceId
         };
-        _unitOfWork.Repository<Project>().Add(project);
+        if (mapping.Count > 0) _unitOfWork.Repository<Project>()?.Add(project);
         var result = await _unitOfWork.Complete();
         if (result <= 0) return BadRequest(new ApiResponse(400, "Problem creating project"));
         return Ok(project);
@@ -91,7 +98,7 @@ public class ProjectController : Controller
     [HttpPut]
     public async Task<ActionResult<Project>> UpdateProject(Project projectToUpdate)
     {
-        _unitOfWork.Repository<Project>().Update(projectToUpdate);
+        _unitOfWork.Repository<Project>()?.Update(projectToUpdate);
         var result = await _unitOfWork.Complete();
         if (result <= 0) return BadRequest(new ApiResponse(400, "Problem updating project"));
         return Ok(projectToUpdate);
@@ -101,8 +108,8 @@ public class ProjectController : Controller
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> DeleteProject(Guid id)
     {
-        var project = await _unitOfWork.Repository<Project>().GetByIdAsync(id);
-        _unitOfWork.Repository<Project>().Delete(project);
+        var project = await _unitOfWork.Repository<Project>()?.GetByIdAsync(id)!;
+        _unitOfWork.Repository<Project>()?.Delete(project);
         var result = await _unitOfWork.Complete();
         if (result <= 0) return BadRequest(new ApiResponse(400, "Problem deleting project"));
         return Ok();
@@ -112,7 +119,7 @@ public class ProjectController : Controller
     [HttpGet("statuses")]
     public async Task<ActionResult<IReadOnlyList<ProjectStatus>>> GetProjectStatuses()
     {
-        var statuses = await _unitOfWork.Repository<ProjectStatus>().ListAllAsync();
+        var statuses = await _unitOfWork.Repository<ProjectStatus>()?.ListAllAsync()!;
         // if (statuses.Count < 0) return NotFound(new ApiResponse(404));
         return Ok(statuses);
     }
