@@ -38,6 +38,7 @@ public class ProjectController : Controller
         
         var data = projects.Select(project => new ProjectReturnDto
         {
+            Id = project.Id,
             Name = project.Name,
             CreatedAt = project.CreatedAt,
             Status = project.Status,
@@ -61,6 +62,7 @@ public class ProjectController : Controller
         // if (client == null) return NotFound(new ApiResponse(404));
         return new ProjectReturnDto
         {
+            Id = project.Id,
             Name = project.Name,
             CreatedAt = project.CreatedAt,
             Status = project.Status,
